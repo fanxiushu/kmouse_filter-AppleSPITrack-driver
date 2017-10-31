@@ -1,0 +1,22 @@
+
+## fanxiushu 2017-10-23 
+
+TARGETNAME=../../kmouse_filter
+TARGETTYPE=DRIVER
+
+KMDF_VERSION_MAJOR=1
+
+MSC_WARNING_LEVEL=/W2 /WX
+
+TARGETLIBS=$(TARGETLIBS) \
+           $(DDK_LIB_PATH)\wdmsec.lib \
+	   $(DDK_LIB_PATH)\hidclass.lib \
+           $(DDK_LIB_PATH)\ntstrsafe.lib kmouse_filter.res 
+
+INCLUDES=$(INCLUDES);
+
+SOURCES= main.cpp apple_tp_parse.cpp \
+	     kmouse_filter.cpp request.cpp
+
+TARGET_DESTINATION=wdf
+
