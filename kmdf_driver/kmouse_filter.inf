@@ -1,0 +1,116 @@
+
+;
+;  By Fanxiushu 2017-10-30 
+;  macbook pro 13寸 2017年版本开发的windows 触摸板驱动
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+
+Class=HIDClass
+ClassGuid={745a17a0-74d3-11d0-b6fe-00a0c90f57da}
+
+Provider=%MFT%
+CatalogFile=kmouse_filter.cat
+DriverVer=10/15/2017,1.0.0.1
+
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+[SourceDisksNames]
+99 = %DiskName%,,,""
+
+[SourceDisksFiles]
+kmouse_filter.sys  = 99,,
+
+[Manufacturer]
+%MFT%=MouseStd, NTamd64.6.1
+
+[MouseStd]
+
+
+[MouseStd.NTamd64.6.1]
+%kmouse_filter.DeviceDesc%=kmouse_filter_Device, SPI\VID_05ac&PID_0272&MI_02
+%kmouse_filter.DeviceDesc%=kmouse_filter_Device, SPI\VID_05ac&PID_0273&MI_02
+%kmouse_filter.DeviceDesc%=kmouse_filter_Device, SPI\VID_05ac&PID_0275&MI_02
+%kmouse_filter.DeviceDesc%=kmouse_filter_Device, SPI\VID_05ac&PID_0276&MI_02
+%kmouse_filter.DeviceDesc%=kmouse_filter_Device, SPI\VID_05ac&PID_0277&MI_02 ;;;;; 
+%kmouse_filter.DeviceDesc%=kmouse_filter_Device, SPI\VID_05ac&PID_0278&MI_02
+%kmouse_filter.DeviceDesc%=kmouse_filter_Device, SPI\VID_05ac&PID_0279&MI_02
+%kmouse_filter.DeviceDesc%=kmouse_filter_Device, SPI\VID_05ac&PID_0290&MI_02
+%kmouse_filter.DeviceDesc%=kmouse_filter_Device, SPI\VID_05ac&PID_0291&MI_02
+
+[ControlFlags]
+;ExcludeFromSelect = %HardWareId%
+
+
+[kmouse_filter_Device.NT]
+CopyFiles=Drivers_Dir
+
+[kmouse_filter_Device.NT.HW]
+AddReg = kmouse_filter_Device.AddReg 
+
+[kmouse_filter_Device.AddReg]
+HKR,,"LowerFilters",0x00010008,"kmouse_filter"
+
+[Drivers_Dir]
+kmouse_filter.sys
+
+;-------------- Service installation
+[kmouse_filter_Device.NT.Services]
+AddService = kmouse_filter,, kmouse_filter_Service_Inst
+AddService = mshidkmdf, 0x00000002, mshidkmdf.AddService ;flag 0x2 sets this as the service for the device
+
+[mshidkmdf.AddService]
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %10%\System32\Drivers\mshidkmdf.sys
+
+; -------------- kmouse_filter driver install sections
+[kmouse_filter_Service_Inst]
+DisplayName    = %kmouse_filter.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\kmouse_filter.sys
+LoadOrderGroup = Extended Base
+
+
+;
+;--- kmouse_filter_Device Coinstaller installation ------
+;
+
+[DestinationDirs]
+kmouse_filter_Device_CoInstaller_CopyFiles = 11
+
+[kmouse_filter_Device.NT.CoInstallers]
+AddReg=kmouse_filter_Device_CoInstaller_AddReg
+CopyFiles=kmouse_filter_Device_CoInstaller_CopyFiles
+
+[kmouse_filter_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01009.dll,WdfCoInstaller"
+
+[kmouse_filter_Device_CoInstaller_CopyFiles]
+WdfCoInstaller01009.dll
+
+[SourceDisksFiles]
+WdfCoInstaller01009.dll=99 ; make sure the number matches with SourceDisksNames
+
+[kmouse_filter_Device.NT.Wdf]
+KmdfService =  kmouse_filter, kmouse_filter_wdfsect
+
+[kmouse_filter_wdfsect]
+KmdfLibraryVersion = 1.9
+
+
+[Strings]
+MFT = "Fanxiushu."
+;HardWareId="*kmouse_filter"
+DiskName = "Fanxiushu KmouseFilter Installation Disk"
+kmouse_filter.DeviceDesc = "Fanxiushu KmouseFilter AppleSPITrackpad"
+kmouse_filter.SVCDESC = "Fanxiushu KmouseFilter Service"
+
+
+
